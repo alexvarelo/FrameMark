@@ -221,10 +221,10 @@ export const PhotoMetadataApp: React.FC = () => {
 
     // Studio Layout
     return (
-        <div className="h-screen w-full bg-neutral-100 flex flex-col lg:flex-row overflow-hidden font-sans text-neutral-900">
+        <div className="min-h-screen lg:h-screen w-full bg-neutral-100 flex flex-col lg:flex-row font-sans text-neutral-900 lg:overflow-hidden overflow-auto">
 
             {/* Main Stage (Canvas) */}
-            <div className="flex-1 bg-neutral-200/50 relative flex items-center justify-center overflow-hidden p-4 lg:p-8">
+            <div className="flex-1 bg-neutral-200/50 relative flex items-center justify-center overflow-hidden p-4 lg:p-8 min-h-[50vh] lg:min-h-0">
                 <PhotoCanvas
                     image={image}
                     metadata={metadata}
