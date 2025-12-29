@@ -114,7 +114,7 @@ export const PhotoGallery = ({
             <p className="text-center text-xs font-light uppercase tracking-widest text-neutral-400 mb-6">
                 Inspiration
             </p>
-            <div className="relative h-[400px] w-full flex items-center justify-center">
+            <div className="relative h-[460px] w-full flex items-center justify-center">
                 <motion.div
                     className="relative mx-auto flex w-full max-w-7xl justify-center"
                     initial={{ opacity: 0 }}
@@ -127,7 +127,7 @@ export const PhotoGallery = ({
                         initial="hidden"
                         animate={isLoaded ? "visible" : "hidden"}
                     >
-                        <div className="relative h-[320px] w-[320px]">
+                        <div className="relative h-[380px] w-[380px]">
                             {[...photos].reverse().map((photo) => (
                                 <motion.div
                                     key={photo.id}
@@ -141,8 +141,8 @@ export const PhotoGallery = ({
                                     }}
                                 >
                                     <Photo
-                                        width={320}
-                                        height={320}
+                                        width={380}
+                                        height={380}
                                         src={photo.src}
                                         alt="Example photo"
                                         direction={photo.direction}
