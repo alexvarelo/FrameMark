@@ -5,7 +5,7 @@ import { PhotoCanvas } from './PhotoCanvas';
 import type { AspectRatio, TextPosition } from './PhotoCanvas';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../lib/crop-utils';
-import { PhotoGallery } from './ui/gallery';
+import FlipGallery from './ui/flip-gallery';
 import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon } from 'lucide-react';
 
 export const PhotoMetadataApp: React.FC = () => {
@@ -178,9 +178,12 @@ export const PhotoMetadataApp: React.FC = () => {
         return (
             <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-200 flex flex-col items-center justify-center p-6">
                 <header className="mb-6 text-center space-y-3 pt-16">
-                    <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
-                        FrameMark
-                    </h1>
+                    <div className="flex items-center justify-center">
+                        <img src="/favicon.png" alt="FrameMark" className="w-20 h-20 md:w-40 md:h-40" />
+                        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
+                            Framemark
+                        </h1>
+                    </div>
                     <div className="space-y-2 max-w-xl mx-auto">
                         <p className="text-lg font-medium text-neutral-800">
                             The extracted metadata camera frame tool.
@@ -197,30 +200,40 @@ export const PhotoMetadataApp: React.FC = () => {
                         <p className="text-neutral-500 font-medium italic">Developing your photo...</p>
                     </div>
                 ) : (
-                    <div className="w-full max-w-4xl mx-auto space-y-8">
-                        {/* Upload Area */}
-                        <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full max-w-xl mx-auto aspect-[21/9] border-2 border-dashed border-neutral-200 rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-neutral-400 hover:bg-white hover:shadow-xl transition-all group relative overflow-hidden bg-neutral-50/50"
-                        >
-                            <div className="p-4 rounded-full bg-white border border-neutral-100 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                                <Upload className="w-8 h-8 text-neutral-800" />
+                    <div className="w-full max-w-6xl mx-auto">
+                        {/* Desktop: side-by-side, Mobile: stacked */}
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 md:gap-12">
+                            {/* Upload Area */}
+                            <div className="flex-1">
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-full max-w-xl mx-auto md:mx-0 aspect-[21/9] border-2 border-dashed border-neutral-200 rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-neutral-400 hover:bg-white hover:shadow-xl transition-all group relative overflow-hidden bg-neutral-50/50"
+                                >
+                                    <div className="p-4 rounded-full bg-white border border-neutral-100 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                        <Upload className="w-8 h-8 text-neutral-800" />
+                                    </div>
+                                    <div className="text-center space-y-1">
+                                        <p className="font-bold text-neutral-800 text-lg">Drop your photo here</p>
+                                        <p className="text-sm text-neutral-400">Supports JPG, PNG, HEIC with EXIF</p>
+                                    </div>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
+                                </div>
                             </div>
-                            <div className="text-center space-y-1">
-                                <p className="font-bold text-neutral-800 text-lg">Drop your photo here</p>
-                                <p className="text-sm text-neutral-400">Supports JPG, PNG, HEIC with EXIF</p>
-                            </div>
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                                accept="image/*"
-                                className="hidden"
-                            />
-                        </div>
 
-                        {/* PhotoGallery */}
-                        <PhotoGallery animationDelay={0.3} />
+                            {/* FlipGallery with label */}
+                            <div className="flex-shrink-0">
+                                <p className="text-center text-xs font-light uppercase tracking-widest text-neutral-400 mb-4">
+                                    Inspiration
+                                </p>
+                                <FlipGallery />
+                            </div>
+                        </div>
                     </div>
                 )}
 
