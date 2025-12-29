@@ -176,13 +176,18 @@ export const PhotoMetadataApp: React.FC = () => {
     if (!image || !metadata) {
         return (
             <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-200 flex flex-col items-center justify-center p-6">
-                <header className="mb-12 text-center">
-                    <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-500">
+                <header className="mb-12 text-center space-y-6">
+                    <h1 className="text-6xl md:text-7xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
                         FrameMark
                     </h1>
-                    <p className="text-neutral-500 text-lg max-w-lg mx-auto">
-                        Professional framing for your photography. Minimalist metadata borders.
-                    </p>
+                    <div className="space-y-4 max-w-xl mx-auto">
+                        <p className="text-xl font-medium text-neutral-800">
+                            The extracted metadata camera frame tool.
+                        </p>
+                        <p className="text-neutral-500 leading-relaxed">
+                            Elevate your photography with minimalist, metadata-rich borders. FrameMark automatically extracts EXIF data to create professional, gallery-ready showcase images in seconds. No manual typing required.
+                        </p>
+                    </div>
                 </header>
 
                 {loading ? (
@@ -191,28 +196,57 @@ export const PhotoMetadataApp: React.FC = () => {
                         <p className="text-neutral-500 font-medium italic">Developing your photo...</p>
                     </div>
                 ) : (
-                    <div
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-full max-w-2xl aspect-video border-2 border-dashed border-neutral-300 rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-neutral-400 hover:bg-neutral-100 transition-all group relative overflow-hidden bg-white shadow-sm"
-                    >
-                        <div className="p-5 rounded-full bg-neutral-50 border border-neutral-100 shadow-sm group-hover:scale-110 transition-transform">
-                            <Upload className="w-8 h-8 text-neutral-600" />
+                    <div className="w-full max-w-4xl mx-auto space-y-16">
+                        {/* Upload Area */}
+                        <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full max-w-2xl mx-auto aspect-video border-2 border-dashed border-neutral-200 rounded-[2rem] flex flex-col items-center justify-center gap-6 cursor-pointer hover:border-neutral-400 hover:bg-white hover:shadow-xl transition-all group relative overflow-hidden bg-neutral-50/50"
+                        >
+                            <div className="p-6 rounded-full bg-white border border-neutral-100 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                <Upload className="w-10 h-10 text-neutral-800" />
+                            </div>
+                            <div className="text-center space-y-2">
+                                <p className="font-bold text-neutral-800 text-xl">Drop your photo here</p>
+                                <p className="text-neutral-400">Supports JPG, PNG, HEIC with EXIF</p>
+                            </div>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept="image/*"
+                                className="hidden"
+                            />
                         </div>
-                        <div className="text-center">
-                            <p className="font-semibold text-neutral-700 text-lg">Click to upload or drag and drop</p>
-                            <p className="text-sm text-neutral-400 mt-1">JPG, PNG or HEIC with EXIF data</p>
+
+                        {/* Inspiration Carousel */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4 text-neutral-400 text-sm font-medium uppercase tracking-widest justify-center">
+                                <span className="h-px w-8 bg-neutral-200"></span>
+                                <span>Inspiration</span>
+                                <span className="h-px w-8 bg-neutral-200"></span>
+                            </div>
+
+                            <div className="flex overflow-x-auto pb-8 gap-6 px-4 md:px-0 snap-x snap-mandatory justify-start md:justify-center">
+                                {[
+                                    '/examples/example1.jpg',
+                                    '/examples/example2.jpg',
+                                    '/examples/example3.jpg',
+                                    '/examples/example4.jpg'
+                                ].map((src, i) => (
+                                    <div key={i} className="snap-center shrink-0 first:pl-4 last:pr-4 md:first:pl-0 md:last:pr-0">
+                                        <img
+                                            src={src}
+                                            alt={`Example ${i + 1}`}
+                                            className="w-48 md:w-64 aspect-[4/5] object-cover rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-white"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            accept="image/*"
-                            className="hidden"
-                        />
                     </div>
                 )}
 
-                <footer className="mt-20 text-center text-neutral-400 text-sm">
+                <footer className="mt-20 text-center text-neutral-400 text-sm pb-8">
                     <p>© 2025 FrameMark • Minimal Design</p>
                 </footer>
             </div>
