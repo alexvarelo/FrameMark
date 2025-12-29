@@ -49,6 +49,8 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
         const contentWidth = image.width + basePadding * 2;
         const contentHeight = image.height + basePadding + extraVerticalSpace;
 
+        const textGapFactor = 0.25; // Closer to image (was ~0.44)
+
         if (aspectRatio === 'original') {
             canvasWidth = contentWidth;
             canvasHeight = contentHeight;
@@ -56,11 +58,11 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
             if (textPosition === 'top') {
                 imageX = basePadding;
                 imageY = extraVerticalSpace;
-                textY = extraVerticalSpace * 0.44;
+                textY = extraVerticalSpace * (1 - textGapFactor);
             } else {
                 imageX = basePadding;
                 imageY = basePadding;
-                textY = imageY + image.height + extraVerticalSpace * 0.44;
+                textY = imageY + image.height + extraVerticalSpace * textGapFactor;
             }
         } else {
             // Fixed Aspect Ratios
@@ -92,13 +94,13 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
                 const contentStartY = centerY - contentHeight / 2;
                 imageY = contentStartY + extraVerticalSpace;
                 imageX = centerX - image.width / 2;
-                textY = contentStartY + extraVerticalSpace * 0.44;
+                textY = contentStartY + extraVerticalSpace * (1 - textGapFactor);
 
             } else {
                 const contentStartY = centerY - contentHeight / 2;
                 imageY = contentStartY + basePadding;
                 imageX = centerX - image.width / 2;
-                textY = imageY + image.height + extraVerticalSpace * 0.44;
+                textY = imageY + image.height + extraVerticalSpace * textGapFactor;
             }
         }
 
