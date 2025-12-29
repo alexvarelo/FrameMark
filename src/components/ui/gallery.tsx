@@ -65,7 +65,7 @@ export const PhotoGallery = ({
         {
             id: 1,
             order: 0,
-            x: "-320px",
+            x: "-400px",
             y: "15px",
             zIndex: 50,
             direction: "left" as Direction,
@@ -74,7 +74,7 @@ export const PhotoGallery = ({
         {
             id: 2,
             order: 1,
-            x: "-160px",
+            x: "-200px",
             y: "32px",
             zIndex: 40,
             direction: "left" as Direction,
@@ -92,7 +92,7 @@ export const PhotoGallery = ({
         {
             id: 4,
             order: 3,
-            x: "160px",
+            x: "200px",
             y: "22px",
             zIndex: 20,
             direction: "right" as Direction,
@@ -101,7 +101,7 @@ export const PhotoGallery = ({
         {
             id: 5,
             order: 4,
-            x: "320px",
+            x: "400px",
             y: "44px",
             zIndex: 10,
             direction: "left" as Direction,
@@ -114,7 +114,7 @@ export const PhotoGallery = ({
             <p className="text-center text-xs font-light uppercase tracking-widest text-neutral-400 mb-6">
                 Inspiration
             </p>
-            <div className="relative h-[460px] w-full flex items-center justify-center">
+            <div className="relative h-[500px] w-full flex items-center justify-center">
                 <motion.div
                     className="relative mx-auto flex w-full max-w-7xl justify-center"
                     initial={{ opacity: 0 }}
@@ -127,7 +127,7 @@ export const PhotoGallery = ({
                         initial="hidden"
                         animate={isLoaded ? "visible" : "hidden"}
                     >
-                        <div className="relative h-[380px] w-[380px]">
+                        <div className="relative h-[420px] w-[420px]">
                             {[...photos].reverse().map((photo) => (
                                 <motion.div
                                     key={photo.id}
@@ -141,8 +141,8 @@ export const PhotoGallery = ({
                                     }}
                                 >
                                     <Photo
-                                        width={380}
-                                        height={380}
+                                        width={420}
+                                        height={420}
                                         src={photo.src}
                                         alt="Example photo"
                                         direction={photo.direction}
