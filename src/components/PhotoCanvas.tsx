@@ -40,39 +40,49 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({ image, metadata, onCan
         const centerX = canvas.width / 2;
         const baseY = image.height + padding;
 
-        // Line 1: "Shot on" (Lighter Grey) + "MODEL MAKE" (Bold Black)
-        const fontSizeTitle = Math.round(padding * 0.28); // Even smaller
+        // Line 1: "Shot on" (Lighter Grey) + "MODEL" (Bold Black) + "MAKE" (Normal Black)
+        const fontSizeTitle = Math.round(padding * 0.22); // Even smaller
         const textShotOn = 'Shot on ';
-        const model = (metadata.model || 'Unknown Camera').toUpperCase();
+        const model = (metadata.model || 'Unknown').toUpperCase();
         const make = (metadata.make || '').toUpperCase();
-        const textModelMake = `${model} ${make}`.trim();
+        const textModel = `${model} `;
+        const textMake = make;
 
         // Measure widths for centering
         ctx.font = `400 ${fontSizeTitle}px Inter, sans-serif`;
         const widthShotOn = ctx.measureText(textShotOn).width;
         ctx.font = `700 ${fontSizeTitle}px Inter, sans-serif`;
-        const widthModelMake = ctx.measureText(textModelMake).width;
-        const totalWidth = widthShotOn + widthModelMake;
+        const widthModel = ctx.measureText(textModel).width;
+        ctx.font = `400 ${fontSizeTitle}px Inter, sans-serif`;
+        const widthMake = ctx.measureText(textMake).width;
+
+        const totalWidth = widthShotOn + widthModel + widthMake;
 
         let currentX = centerX - totalWidth / 2;
-        const titleY = baseY + bottomPadding * 0.40; // Slightly lower but tighter relative to settings
+        const titleY = baseY + bottomPadding * 0.44; // Slightly more balanced vertical position
 
-        // Draw "Shot on"
+        // Draw "Shot on "
         ctx.font = `400 ${fontSizeTitle}px Inter, sans-serif`;
-        ctx.fillStyle = '#999999'; // Lighter grey
+        ctx.fillStyle = '#999999';
         ctx.textAlign = 'left';
         ctx.fillText(textShotOn, currentX, titleY);
         currentX += widthShotOn;
 
-        // Draw "MODEL MAKE"
+        // Draw "MODEL " (Bold)
         ctx.font = `700 ${fontSizeTitle}px Inter, sans-serif`;
         ctx.fillStyle = '#1a1a1a';
-        ctx.fillText(textModelMake, currentX, titleY);
+        ctx.fillText(textModel, currentX, titleY);
+        currentX += widthModel;
+
+        // Draw "MAKE" (Normal)
+        ctx.font = `400 ${fontSizeTitle}px Inter, sans-serif`;
+        ctx.fillStyle = '#1a1a1a';
+        ctx.fillText(textMake, currentX, titleY);
 
         // Line 2: Settings (Even smaller and lighter)
-        const fontSizeSettings = Math.round(padding * 0.18); // Ultra small
+        const fontSizeSettings = Math.round(padding * 0.14); // Ultra small
         ctx.font = `400 ${fontSizeSettings}px Inter, sans-serif`;
-        ctx.fillStyle = '#bbbbbb'; // Very light grey
+        ctx.fillStyle = '#bbbbbb';
         ctx.textAlign = 'center';
 
         const settingsArr = [
@@ -84,8 +94,9 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({ image, metadata, onCan
 
         const settings = settingsArr.join('  ');
 
-        ctx.fillText(settings, centerX, titleY + fontSizeTitle * 1.2); // Position relative to Line 1
+        ctx.fillText(settings, centerX, titleY + fontSizeTitle * 1.05); // Tighter spacing
 
+        console.log('Canvas rendered, calling onCanvasReady');
         onCanvasReady(canvas);
     }, [image, metadata, onCanvasReady]);
 

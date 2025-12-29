@@ -37,10 +37,15 @@ export const PhotoMetadataApp: React.FC = () => {
     };
 
     const handleDownload = () => {
-        if (!canvas) return;
+        console.log('Download triggered. Canvas exists:', !!canvas);
+        if (!canvas) {
+            alert('Canvas not ready. Please try again in a second.');
+            return;
+        }
         setDownloading(true);
 
         try {
+            console.log('Starting toBlob conversion...');
             canvas.toBlob((blob) => {
                 if (!blob) {
                     console.error('Failed to create blob from canvas');
@@ -48,28 +53,34 @@ export const PhotoMetadataApp: React.FC = () => {
                     return;
                 }
 
+                console.log('Blob created successfully, size:', blob.size);
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
 
                 // Ensure the filename is safe and has the correct extension
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-                link.download = `photo-frame-${timestamp}.jpg`;
+                link.download = `frame-${timestamp}.jpg`;
                 link.href = url;
 
                 // For some browsers, the link must be in the DOM to work
                 document.body.appendChild(link);
+                console.log('Link appended to body, clicking link...');
                 link.click();
 
-                // Cleanup
+                // Cleanup with longer delay to ensure browser handles it
                 setTimeout(() => {
-                    document.body.removeChild(link);
+                    if (document.body.contains(link)) {
+                        document.body.removeChild(link);
+                    }
                     URL.revokeObjectURL(url);
                     setDownloading(false);
-                }, 1000);
+                    console.log('Cleanup finished');
+                }, 3000);
             }, 'image/jpeg', 0.95);
         } catch (err) {
             console.error('Download error:', err);
             setDownloading(false);
+            alert('Download failed. Technical error: ' + (err instanceof Error ? err.message : String(err)));
         }
     };
 
