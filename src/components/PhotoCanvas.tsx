@@ -40,8 +40,8 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({ image, metadata, onCan
         const centerX = canvas.width / 2;
         const baseY = image.height + padding;
 
-        // Line 1: "Shot on" (Grey) + "MODEL MAKE" (Bold Black)
-        const fontSizeTitle = Math.round(padding * 0.32); // Smaller text
+        // Line 1: "Shot on" (Lighter Grey) + "MODEL MAKE" (Bold Black)
+        const fontSizeTitle = Math.round(padding * 0.28); // Even smaller
         const textShotOn = 'Shot on ';
         const model = (metadata.model || 'Unknown Camera').toUpperCase();
         const make = (metadata.make || '').toUpperCase();
@@ -55,11 +55,11 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({ image, metadata, onCan
         const totalWidth = widthShotOn + widthModelMake;
 
         let currentX = centerX - totalWidth / 2;
-        const titleY = baseY + bottomPadding * 0.35;
+        const titleY = baseY + bottomPadding * 0.40; // Slightly lower but tighter relative to settings
 
         // Draw "Shot on"
         ctx.font = `400 ${fontSizeTitle}px Inter, sans-serif`;
-        ctx.fillStyle = '#888888';
+        ctx.fillStyle = '#999999'; // Lighter grey
         ctx.textAlign = 'left';
         ctx.fillText(textShotOn, currentX, titleY);
         currentX += widthShotOn;
@@ -69,10 +69,10 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({ image, metadata, onCan
         ctx.fillStyle = '#1a1a1a';
         ctx.fillText(textModelMake, currentX, titleY);
 
-        // Line 2: Settings (Reference style: light grey, even smaller)
-        const fontSizeSettings = Math.round(padding * 0.22); // Even smaller
+        // Line 2: Settings (Even smaller and lighter)
+        const fontSizeSettings = Math.round(padding * 0.18); // Ultra small
         ctx.font = `400 ${fontSizeSettings}px Inter, sans-serif`;
-        ctx.fillStyle = '#aaaaaa';
+        ctx.fillStyle = '#bbbbbb'; // Very light grey
         ctx.textAlign = 'center';
 
         const settingsArr = [
@@ -82,10 +82,9 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({ image, metadata, onCan
             formatISO(metadata.iso)
         ].filter(Boolean);
 
-        // Settings format: space separated or dot? Screenshot shows spaces.
         const settings = settingsArr.join('  ');
 
-        ctx.fillText(settings, centerX, baseY + bottomPadding * 0.60);
+        ctx.fillText(settings, centerX, titleY + fontSizeTitle * 1.2); // Position relative to Line 1
 
         onCanvasReady(canvas);
     }, [image, metadata, onCanvasReady]);
