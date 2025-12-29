@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { extractMetadata } from '../lib/exif-utils';
 import type { PhotoMetadata } from '../lib/exif-utils';
 import { PhotoCanvas } from './PhotoCanvas';
-import { Upload, Download, RefreshCcw } from 'lucide-react';
+import { Upload, Download, RefreshCcw, ExternalLink } from 'lucide-react';
 
 export const PhotoMetadataApp: React.FC = () => {
     const [image, setImage] = useState<HTMLImageElement | null>(null);
@@ -50,6 +50,14 @@ export const PhotoMetadataApp: React.FC = () => {
                 if (!blob) {
                     console.error('Failed to create blob from canvas');
                     setDownloading(false);
+                    alert('Failed to process image. Please try "Open Image" instead.');
+                    return;
+                }
+
+                if (blob.size < 100) {
+                    console.error('Blob too small:', blob.size);
+                    setDownloading(false);
+                    alert('Generated image is empty. Please try "Open Image" instead.');
                     return;
                 }
 
@@ -57,11 +65,11 @@ export const PhotoMetadataApp: React.FC = () => {
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
 
-                // Simple, safe filename format
+                // Simple, safe filename format with underscores
                 const date = new Date();
-                const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
-                const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
-                link.download = `framemark-${dateStr}-${timeStr}.jpg`;
+                const dateStr = date.toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD
+                const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, ''); // HHMMSS
+                link.download = `framemark_${dateStr}_${timeStr}.jpg`;
                 link.href = url;
                 link.type = 'image/jpeg';
 
@@ -79,7 +87,6 @@ export const PhotoMetadataApp: React.FC = () => {
                 link.dispatchEvent(clickEvent);
 
                 // UI state: Clear the loading spinner quickly (after 2s)
-                // so the user isn't locked out for a whole minute.
                 setTimeout(() => {
                     setDownloading(false);
                     console.log('UI state: downloading set to false');
@@ -98,6 +105,28 @@ export const PhotoMetadataApp: React.FC = () => {
             console.error('Download error:', err);
             setDownloading(false);
             alert('Download failed. Technical error: ' + (err instanceof Error ? err.message : String(err)));
+        }
+    };
+
+    const handleOpenOriginal = () => {
+        if (!canvas) return;
+        try {
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+            const win = window.open();
+            if (win) {
+                win.document.write(
+                    `<img src="${dataUrl}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;">` +
+                    `<div style="text-align: center; padding: 20px; font-family: sans-serif;">` +
+                    `<p>Right-click the image and select <strong>"Save Image As..."</strong></p>` +
+                    `</div>`
+                );
+                win.document.title = "FrameMark - Save Image";
+            } else {
+                alert('Pop-up blocked. Please allow pop-ups for this site to open the image.');
+            }
+        } catch (err) {
+            console.error('Error opening image:', err);
+            alert('Failed to open image. It might be too large.');
         }
     };
 
@@ -184,6 +213,14 @@ export const PhotoMetadataApp: React.FC = () => {
                                             Download Framed Photo
                                         </>
                                     )}
+                                </button>
+                                <button
+                                    onClick={handleOpenOriginal}
+                                    disabled={!canvas || downloading}
+                                    className="px-6 py-3 border border-neutral-200 bg-white text-neutral-600 rounded-full font-semibold flex items-center gap-2 hover:bg-neutral-50 transition-all active:scale-95 disabled:opacity-50"
+                                >
+                                    <ExternalLink className="w-5 h-5" />
+                                    Open Image
                                 </button>
                                 <button
                                     onClick={reset}
