@@ -3,7 +3,7 @@ import { extractMetadata } from '../lib/exif-utils';
 import type { PhotoMetadata } from '../lib/exif-utils';
 import { PhotoCanvas } from './PhotoCanvas';
 import type { AspectRatio, TextPosition } from './PhotoCanvas';
-import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type } from 'lucide-react';
+import { Upload, Download, RefreshCcw, ExternalLink, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type } from 'lucide-react';
 
 export const PhotoMetadataApp: React.FC = () => {
     const [image, setImage] = useState<HTMLImageElement | null>(null);
