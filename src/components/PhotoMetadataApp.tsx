@@ -63,21 +63,36 @@ export const PhotoMetadataApp: React.FC = () => {
                 const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
                 link.download = `framemark-${dateStr}-${timeStr}.jpg`;
                 link.href = url;
+                link.type = 'image/jpeg';
 
-                // For some browsers, the link must be in the DOM to work
+                // For some browsers, the link must be in the DOM and visible (even if 0px) to work reliably
+                link.style.display = 'none';
                 document.body.appendChild(link);
                 console.log('Link appended to body, clicking link...');
-                link.click();
 
-                // Increase timeout to 60 seconds to accommodate "Save As" dialogs
+                // More robust click trigger
+                const clickEvent = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                link.dispatchEvent(clickEvent);
+
+                // UI state: Clear the loading spinner quickly (after 2s)
+                // so the user isn't locked out for a whole minute.
+                setTimeout(() => {
+                    setDownloading(false);
+                    console.log('UI state: downloading set to false');
+                }, 2000);
+
+                // Resource cleanup: Keep the URL valid for 60s for "Save As" users
                 setTimeout(() => {
                     if (document.body.contains(link)) {
                         document.body.removeChild(link);
                     }
                     URL.revokeObjectURL(url);
-                    setDownloading(false);
                     console.log('Cleanup finished after 60s');
-                }, 60000); // 60 seconds
+                }, 60000);
             }, 'image/jpeg', 0.95);
         } catch (err) {
             console.error('Download error:', err);
@@ -90,6 +105,7 @@ export const PhotoMetadataApp: React.FC = () => {
         setImage(null);
         setMetadata(null);
         setCanvas(null);
+        setDownloading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
