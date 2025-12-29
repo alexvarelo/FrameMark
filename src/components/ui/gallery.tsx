@@ -240,7 +240,7 @@ export const Photo = ({
         >
             <div className="relative h-full w-full overflow-hidden rounded-3xl shadow-lg">
                 <img
-                    className="rounded-3xl w-full h-full object-contain bg-neutral-100"
+                    className="rounded-3xl w-full h-full object-cover"
                     src={src}
                     alt={alt}
                     draggable={false}
