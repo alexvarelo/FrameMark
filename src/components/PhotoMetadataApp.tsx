@@ -224,7 +224,19 @@ export const PhotoMetadataApp: React.FC = () => {
                     </div>
                 )}
 
-                <footer className="mt-8 text-center text-neutral-400 text-xs">
+                <footer className="mt-8 text-center text-neutral-400 text-xs space-y-2">
+                    <div className="flex items-center justify-center gap-2">
+                        <Camera className="w-3 h-3" />
+                        <span>Built by</span>
+                        <a
+                            href="https://alexvareloraw.site/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-neutral-600 hover:text-neutral-900 transition-colors underline underline-offset-2"
+                        >
+                            alexvarelo
+                        </a>
+                    </div>
                     <p>© 2025 FrameMark • Minimal Design</p>
                 </footer>
             </div>
