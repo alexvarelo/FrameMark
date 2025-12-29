@@ -176,8 +176,8 @@ export const PhotoMetadataApp: React.FC = () => {
     // If no image, show the landing/upload view
     if (!image || !metadata) {
         return (
-            <div className="h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-200 flex flex-col items-center justify-center p-6 overflow-hidden">
-                <header className="mb-6 text-center space-y-3">
+            <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-200 flex flex-col items-center justify-center p-6">
+                <header className="mb-6 text-center space-y-3 pt-16">
                     <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
                         FrameMark
                     </h1>
