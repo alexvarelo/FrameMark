@@ -57,9 +57,11 @@ export const PhotoMetadataApp: React.FC = () => {
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
 
-                // Ensure the filename is safe and has the correct extension
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-                link.download = `frame-${timestamp}.jpg`;
+                // Simple, safe filename format
+                const date = new Date();
+                const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+                const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS
+                link.download = `framemark-${dateStr}-${timeStr}.jpg`;
                 link.href = url;
 
                 // For some browsers, the link must be in the DOM to work
@@ -67,15 +69,15 @@ export const PhotoMetadataApp: React.FC = () => {
                 console.log('Link appended to body, clicking link...');
                 link.click();
 
-                // Cleanup with longer delay to ensure browser handles it
+                // Increase timeout to 60 seconds to accommodate "Save As" dialogs
                 setTimeout(() => {
                     if (document.body.contains(link)) {
                         document.body.removeChild(link);
                     }
                     URL.revokeObjectURL(url);
                     setDownloading(false);
-                    console.log('Cleanup finished');
-                }, 3000);
+                    console.log('Cleanup finished after 60s');
+                }, 60000); // 60 seconds
             }, 'image/jpeg', 0.95);
         } catch (err) {
             console.error('Download error:', err);
