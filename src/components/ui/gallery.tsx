@@ -238,9 +238,9 @@ export const Photo = ({
             draggable={false}
             tabIndex={0}
         >
-            <div className="relative h-full w-full overflow-hidden rounded-3xl shadow-lg">
+            <div className="relative h-full w-full overflow-hidden rounded-3xl shadow-lg bg-white">
                 <img
-                    className="rounded-3xl w-full h-full object-cover"
+                    className="rounded-3xl w-full h-full object-contain"
                     src={src}
                     alt={alt}
                     draggable={false}
