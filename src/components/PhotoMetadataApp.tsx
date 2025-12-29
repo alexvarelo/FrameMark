@@ -3,7 +3,9 @@ import { extractMetadata } from '../lib/exif-utils';
 import type { PhotoMetadata } from '../lib/exif-utils';
 import { PhotoCanvas } from './PhotoCanvas';
 import type { AspectRatio, TextPosition } from './PhotoCanvas';
-import { Upload, Download, RefreshCcw, ExternalLink, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type } from 'lucide-react';
+import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '../lib/crop-utils';
+import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon } from 'lucide-react';
 
 export const PhotoMetadataApp: React.FC = () => {
     const [image, setImage] = useState<HTMLImageElement | null>(null);
@@ -19,6 +21,14 @@ export const PhotoMetadataApp: React.FC = () => {
     const [textPosition, setTextPosition] = useState<TextPosition>('bottom');
     const [headerScale, setHeaderScale] = useState(1.0);
     const [paramsScale, setParamsScale] = useState(1.0);
+    const [marginScale, setMarginScale] = useState(1.0);
+
+    // Cropping State
+    const [isCropping, setIsCropping] = useState(false);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [originalImageSrc, setOriginalImageSrc] = useState<string | null>(null);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -34,11 +44,38 @@ export const PhotoMetadataApp: React.FC = () => {
             const img = new Image();
             img.onload = () => {
                 setImage(img);
+                setOriginalImageSrc(img.src);
                 setLoading(false);
             };
             img.src = URL.createObjectURL(file);
         } catch (error) {
             console.error('Error processing image:', error);
+            setLoading(false);
+        }
+    };
+
+    const onCropComplete = (_croppedArea: any, croppedAreaPixels: any) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    };
+
+    const showCroppedImage = async () => {
+        if (!originalImageSrc || !croppedAreaPixels) return;
+        try {
+            setLoading(true);
+            const croppedImageBlob = await getCroppedImg(
+                originalImageSrc,
+                croppedAreaPixels
+            );
+
+            const img = new Image();
+            img.onload = () => {
+                setImage(img);
+                setLoading(false);
+                setIsCropping(false);
+            };
+            img.src = croppedImageBlob;
+        } catch (e) {
+            console.error(e);
             setLoading(false);
         }
     };
@@ -125,6 +162,7 @@ export const PhotoMetadataApp: React.FC = () => {
         setTextPosition('bottom');
         setHeaderScale(1.0);
         setParamsScale(1.0);
+        setMarginScale(1.0);
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
@@ -195,8 +233,56 @@ export const PhotoMetadataApp: React.FC = () => {
                     textPosition={textPosition}
                     headerScale={headerScale}
                     paramsScale={paramsScale}
+                    marginScale={marginScale}
                 />
             </div>
+
+            {/* Crop Overlay */}
+            {isCropping && originalImageSrc && (
+                <div className="absolute inset-0 z-50 bg-black flex flex-col">
+                    <div className="relative flex-1">
+                        <Cropper
+                            image={originalImageSrc}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={undefined} // Free crop or maybe lock to aspectRatio? Let's leave free for now or match selected. 
+                            // User wants to "crop the image". Usually means composition.
+                            onCropChange={setCrop}
+                            onCropComplete={onCropComplete}
+                            onZoomChange={setZoom}
+                        />
+                    </div>
+                    <div className="p-6 bg-neutral-900 flex items-center justify-between gap-4">
+                        <div className="flex flex-col gap-2 w-1/3">
+                            <span className="text-white text-xs font-bold uppercase tracking-widest">Zoom</span>
+                            <input
+                                type="range"
+                                value={zoom}
+                                min={1}
+                                max={3}
+                                step={0.1}
+                                aria-labelledby="Zoom"
+                                onChange={(e) => setZoom(Number(e.target.value))}
+                                className="w-full h-1 bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-white"
+                            />
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setIsCropping(false)}
+                                className="px-6 py-3 rounded-xl font-medium text-white hover:bg-neutral-800 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={showCroppedImage}
+                                className="px-6 py-3 rounded-xl font-bold bg-white text-black hover:bg-neutral-200 transition-colors"
+                            >
+                                Apply Crop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Control Panel (Sidebar) */}
             <div className="w-full lg:w-[400px] bg-white/80 backdrop-blur-xl border-l border-white/20 shadow-2xl lg:shadow-none z-10 flex flex-col h-auto lg:h-full transition-all overflow-y-auto">
@@ -208,6 +294,47 @@ export const PhotoMetadataApp: React.FC = () => {
                 </div>
 
                 <div className="flex-1 p-6 flex flex-col gap-8 overflow-y-auto">
+
+                    {/* Image Tools */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-3 text-neutral-500">
+                            <ImageIcon className="w-4 h-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Image</span>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setIsCropping(true)}
+                                className="flex-1 py-3 px-4 bg-white border border-neutral-200 text-neutral-700 rounded-xl font-medium text-sm hover:bg-neutral-50 hover:border-neutral-300 transition-all flex items-center justify-center gap-2 shadow-sm"
+                            >
+                                <CropIcon className="w-4 h-4" /> Crop / Resize
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Spacing */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-3 text-neutral-500">
+                            <Maximize2 className="w-4 h-4" /> {/* Reusing Maximize2 or Layout icon */}
+                            <span className="text-xs font-bold uppercase tracking-widest">Spacing</span>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-neutral-100 shadow-sm">
+                            <div className="flex flex-col gap-1">
+                                <div className="flex justify-between items-center text-xs text-neutral-500 font-medium uppercase tracking-wider">
+                                    <span>Margins</span>
+                                    <span>{Math.round(marginScale * 100)}%</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="2"
+                                    step="0.05"
+                                    value={marginScale}
+                                    onChange={(e) => setMarginScale(parseFloat(e.target.value))}
+                                    className="w-full h-1 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-neutral-900"
+                                />
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Metadata Summary */}
                     <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-100">

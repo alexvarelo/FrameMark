@@ -13,6 +13,7 @@ interface PhotoCanvasProps {
     textPosition: TextPosition;
     headerScale?: number;
     paramsScale?: number;
+    marginScale?: number;
 }
 
 export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
@@ -22,7 +23,8 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
     aspectRatio,
     textPosition,
     headerScale = 1,
-    paramsScale = 1
+    paramsScale = 1,
+    marginScale = 1
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -33,8 +35,11 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Base padding calculation (relative to image size)
-        const basePadding = Math.min(image.width, image.height) * 0.1;
+        // Font Base Unit (independent of margin, relative to image)
+        const fontBasePadding = Math.min(image.width, image.height) * 0.1;
+
+        // Layout Padding (affected by margin scale)
+        const basePadding = fontBasePadding * marginScale;
 
         let canvasWidth = 0;
         let canvasHeight = 0;
@@ -45,7 +50,17 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
         // 1. Calculate Canvas Dimensions AND Content Position
 
         // "Required Content Area" = Image + Padding + Text Space
-        const extraVerticalSpace = textPosition === 'compact' ? basePadding * 1.5 : basePadding * 2.5;
+        // Note: For vertical space, we should probably stick to `fontBasePadding` as the reference unit 
+        // OR should the extra space grow with margins? 
+        // Usually, the "Text Area" size should be unrelated to margins if we want text size constant.
+        // However, `extraVerticalSpace` defines how much white space is ADDED for the text.
+        // If text is constant size, this space should be constant relative to font size (so `fontBasePadding`).
+        // BUT `basePadding` is currently used. 
+        // If I change `extraVerticalSpace` to use `fontBasePadding`, the "Text Band" won't shrink when I shrink margins.
+        // User wants "text should remain same size". Ideally the SPACE for text remains same size too?
+        // Let's assume yes.
+
+        const extraVerticalSpace = textPosition === 'compact' ? fontBasePadding * 1.5 : fontBasePadding * 2.5;
         const contentWidth = image.width + basePadding * 2;
         const contentHeight = image.height + basePadding + extraVerticalSpace;
 
@@ -114,7 +129,7 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
         ctx.drawImage(image, imageX, imageY, image.width, image.height);
 
         // Draw Metadata - HEADER (Shot on...)
-        const fontSizeTitle = Math.round(basePadding * 0.22 * headerScale);
+        const fontSizeTitle = Math.round(fontBasePadding * 0.22 * headerScale);
 
         const textShotOn = "Shot on ";
         const model = (metadata.model || "Unknown").toUpperCase();
@@ -152,7 +167,7 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
         ctx.fillText(textMake, currentX, textY);
 
         // Draw Line 2 (Settings) - PARAMS
-        const fontSizeSettings = Math.round(basePadding * 0.14 * paramsScale);
+        const fontSizeSettings = Math.round(fontBasePadding * 0.14 * paramsScale);
         ctx.font = `400 ${fontSizeSettings}px Inter, sans-serif`;
         ctx.fillStyle = '#bbbbbb';
         ctx.textAlign = 'center';
@@ -172,7 +187,7 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
 
         onCanvasReady(canvas);
 
-    }, [image, metadata, onCanvasReady, aspectRatio, textPosition, headerScale, paramsScale]);
+    }, [image, metadata, onCanvasReady, aspectRatio, textPosition, headerScale, paramsScale, marginScale]);
 
     return (
         <div className="flex items-center justify-center w-full h-full min-h-0 min-w-0">
