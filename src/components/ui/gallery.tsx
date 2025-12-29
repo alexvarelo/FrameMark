@@ -114,7 +114,8 @@ export const PhotoGallery = ({
             <p className="text-center text-xs font-light uppercase tracking-widest text-neutral-400 mb-6">
                 Inspiration
             </p>
-            <div className="relative h-[500px] w-full flex items-center justify-center">
+            {/* Mobile: h-[300px], Desktop: h-[500px] */}
+            <div className="relative h-[300px] md:h-[500px] w-full flex items-center justify-center overflow-hidden">
                 <motion.div
                     className="relative mx-auto flex w-full max-w-7xl justify-center"
                     initial={{ opacity: 0 }}
@@ -127,7 +128,8 @@ export const PhotoGallery = ({
                         initial="hidden"
                         animate={isLoaded ? "visible" : "hidden"}
                     >
-                        <div className="relative h-[420px] w-[420px]">
+                        {/* Mobile: 200px, Desktop: 420px */}
+                        <div className="relative h-[200px] w-[200px] md:h-[420px] md:w-[420px]">
                             {[...photos].reverse().map((photo) => (
                                 <motion.div
                                     key={photo.id}
@@ -141,8 +143,6 @@ export const PhotoGallery = ({
                                     }}
                                 >
                                     <Photo
-                                        width={420}
-                                        height={420}
                                         src={photo.src}
                                         alt="Example photo"
                                         direction={photo.direction}
@@ -171,15 +171,11 @@ export const Photo = ({
     alt,
     className,
     direction,
-    width,
-    height,
 }: {
     src: string;
     alt: string;
     className?: string;
     direction?: Direction;
-    width: number;
-    height: number;
 }) => {
     const [rotation, setRotation] = useState<number>(0);
     const x = useMotionValue(200);
@@ -218,9 +214,13 @@ export const Photo = ({
             }}
             initial={{ rotate: 0 }}
             animate={{ rotate: rotation }}
+            className={cn(
+                className,
+                "relative mx-auto shrink-0 cursor-grab active:cursor-grabbing",
+                // Responsive sizing: 200px on mobile, 420px on desktop
+                "w-[200px] h-[200px] md:w-[420px] md:h-[420px]"
+            )}
             style={{
-                width,
-                height,
                 perspective: 400,
                 transform: `rotate(0deg) rotateX(0deg) rotateY(0deg)`,
                 zIndex: 1,
@@ -229,10 +229,6 @@ export const Photo = ({
                 userSelect: "none",
                 touchAction: "none",
             }}
-            className={cn(
-                className,
-                "relative mx-auto shrink-0 cursor-grab active:cursor-grabbing"
-            )}
             onMouseMove={handleMouse}
             onMouseLeave={resetMouse}
             draggable={false}
