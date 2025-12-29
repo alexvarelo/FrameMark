@@ -110,14 +110,11 @@ export const PhotoGallery = ({
     ];
 
     return (
-        <div className="relative py-12">
-            <p className="text-center text-xs font-light uppercase tracking-widest text-neutral-400 mb-2">
+        <div className="relative py-8">
+            <p className="text-center text-xs font-light uppercase tracking-widest text-neutral-400 mb-6">
                 Inspiration
             </p>
-            <h3 className="mx-auto max-w-2xl text-center text-3xl md:text-4xl font-bold text-neutral-900 mb-8">
-                Gallery-Ready in Seconds
-            </h3>
-            <div className="relative h-[280px] w-full flex items-center justify-center">
+            <div className="relative h-[350px] w-full flex items-center justify-center">
                 <motion.div
                     className="relative mx-auto flex w-full max-w-7xl justify-center"
                     initial={{ opacity: 0 }}
@@ -130,7 +127,7 @@ export const PhotoGallery = ({
                         initial="hidden"
                         animate={isLoaded ? "visible" : "hidden"}
                     >
-                        <div className="relative h-[220px] w-[220px]">
+                        <div className="relative h-[280px] w-[280px]">
                             {[...photos].reverse().map((photo) => (
                                 <motion.div
                                     key={photo.id}
@@ -144,8 +141,8 @@ export const PhotoGallery = ({
                                     }}
                                 >
                                     <Photo
-                                        width={220}
-                                        height={220}
+                                        width={280}
+                                        height={280}
                                         src={photo.src}
                                         alt="Example photo"
                                         direction={photo.direction}
