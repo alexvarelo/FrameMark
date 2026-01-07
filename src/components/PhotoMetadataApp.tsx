@@ -6,11 +6,25 @@ import type { AspectRatio, TextPosition } from './PhotoCanvas';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../lib/crop-utils';
 import FlipGallery from './ui/flip-gallery';
-import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon } from 'lucide-react';
+import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon, Trash2, CheckCircle2 } from 'lucide-react';
+
+interface PhotoData {
+    id: string;
+    image: HTMLImageElement;
+    metadata: PhotoMetadata;
+    originalImageSrc: string;
+    settings: {
+        aspectRatio: AspectRatio;
+        textPosition: TextPosition;
+        headerScale: number;
+        paramsScale: number;
+        marginScale: number;
+    };
+}
 
 export const PhotoMetadataApp: React.FC = () => {
-    const [image, setImage] = useState<HTMLImageElement | null>(null);
-    const [metadata, setMetadata] = useState<PhotoMetadata | null>(null);
+    const [photos, setPhotos] = useState<PhotoData[]>([]);
+    const [selectedIndex, setSelectedIndex] = useState(0);
     const [loading, setLoading] = useState(false);
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
     const [dragActive, setDragActive] = useState(false);
@@ -18,45 +32,67 @@ export const PhotoMetadataApp: React.FC = () => {
 
     const [downloading, setDownloading] = useState(false);
 
-    // Customization State
-    const [aspectRatio, setAspectRatio] = useState<AspectRatio>('original');
-    const [textPosition, setTextPosition] = useState<TextPosition>('bottom');
-    const [headerScale, setHeaderScale] = useState(1.0);
-    const [paramsScale, setParamsScale] = useState(1.0);
-    const [marginScale, setMarginScale] = useState(1.0);
+    // Get current photo data
+    const currentPhoto = photos[selectedIndex];
 
     // Cropping State
     const [isCropping, setIsCropping] = useState(false);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
-    const [originalImageSrc, setOriginalImageSrc] = useState<string | null>(null);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        processFile(file);
+    const updateCurrentSettings = (updates: Partial<PhotoData['settings']>) => {
+        if (!currentPhoto) return;
+        setPhotos(prev => prev.map((p, i) =>
+            i === selectedIndex ? { ...p, settings: { ...p.settings, ...updates } } : p
+        ));
     };
 
-    const processFile = async (file: File) => {
-        setLoading(true);
-        try {
-            // Extract Metadata
-            const meta = await extractMetadata(file);
-            setMetadata(meta);
+    const applyToAll = () => {
+        if (!currentPhoto) return;
+        const settings = currentPhoto.settings;
+        setPhotos(prev => prev.map(p => ({ ...p, settings: { ...settings } })));
+    };
 
-            // Load Image
-            const img = new Image();
-            img.onload = () => {
-                setImage(img);
-                setOriginalImageSrc(img.src);
-                setLoading(false);
-            };
-            img.src = URL.createObjectURL(file);
-        } catch (error) {
-            console.error('Error processing image:', error);
-            setLoading(false);
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+        processFiles(files);
+    };
+
+    const processFiles = async (files: File[]) => {
+        setLoading(true);
+        const newPhotos: PhotoData[] = [];
+
+        for (const file of files) {
+            try {
+                const meta = await extractMetadata(file);
+                const img = await new Promise<HTMLImageElement>((resolve) => {
+                    const i = new Image();
+                    i.onload = () => resolve(i);
+                    i.src = URL.createObjectURL(file);
+                });
+
+                newPhotos.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    image: img,
+                    metadata: meta,
+                    originalImageSrc: img.src,
+                    settings: {
+                        aspectRatio: 'original',
+                        textPosition: 'bottom',
+                        headerScale: 1.0,
+                        paramsScale: 1.0,
+                        marginScale: 1.0,
+                    }
+                });
+            } catch (error) {
+                console.error('Error processing file:', file.name, error);
+            }
         }
+
+        setPhotos(prev => [...prev, ...newPhotos]);
+        setLoading(false);
     };
 
     const handleDrag = (e: React.DragEvent) => {
@@ -73,8 +109,9 @@ export const PhotoMetadataApp: React.FC = () => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            processFile(e.dataTransfer.files[0]);
+        const files = Array.from(e.dataTransfer.files || []);
+        if (files.length > 0) {
+            processFiles(files);
         }
     };
 
@@ -83,17 +120,19 @@ export const PhotoMetadataApp: React.FC = () => {
     };
 
     const showCroppedImage = async () => {
-        if (!originalImageSrc || !croppedAreaPixels) return;
+        if (!currentPhoto || !croppedAreaPixels) return;
         try {
             setLoading(true);
             const croppedImageBlob = await getCroppedImg(
-                originalImageSrc,
+                currentPhoto.originalImageSrc,
                 croppedAreaPixels
             );
 
             const img = new Image();
             img.onload = () => {
-                setImage(img);
+                setPhotos(prev => prev.map((p, i) =>
+                    i === selectedIndex ? { ...p, image: img } : p
+                ));
                 setLoading(false);
                 setIsCropping(false);
             };
@@ -104,18 +143,11 @@ export const PhotoMetadataApp: React.FC = () => {
         }
     };
 
-    const handleDownload = () => {
-        if (!canvas) {
-            alert('Canvas not ready. Please try again in a second.');
-            return;
-        }
-        setDownloading(true);
-
-        try {
-            canvas.toBlob((blob) => {
+    const downloadPhoto = async (photo: PhotoData, canvasElement: HTMLCanvasElement): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            canvasElement.toBlob((blob) => {
                 if (!blob || blob.size < 100) {
-                    setDownloading(false);
-                    alert('Generated image is empty. Please try "Open Image" instead.');
+                    reject(new Error('Empty blob'));
                     return;
                 }
 
@@ -124,35 +156,57 @@ export const PhotoMetadataApp: React.FC = () => {
                 const date = new Date();
                 const dateStr = date.toISOString().split('T')[0].replace(/-/g, '');
                 const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '');
-                link.download = `framemark_${dateStr}_${timeStr}.jpg`;
+                link.download = `framemark_${photo.metadata.model || 'photo'}_${dateStr}_${timeStr}.jpg`;
                 link.href = url;
                 link.type = 'image/jpeg';
                 link.style.display = 'none';
                 document.body.appendChild(link);
-
-                const clickEvent = new MouseEvent('click', {
-                    bubbles: true,
-                    cancelable: true,
-                    view: window
-                });
-                link.dispatchEvent(clickEvent);
+                link.click();
 
                 setTimeout(() => {
-                    setDownloading(false);
-                }, 2000);
-
-                setTimeout(() => {
-                    if (document.body.contains(link)) {
-                        document.body.removeChild(link);
-                    }
+                    if (document.body.contains(link)) document.body.removeChild(link);
                     URL.revokeObjectURL(url);
-                }, 60000);
+                    resolve();
+                }, 100);
             }, 'image/jpeg', 0.95);
+        });
+    };
+
+    const handleDownload = async () => {
+        if (!canvas) {
+            alert('Canvas not ready. Please try again in a second.');
+            return;
+        }
+        setDownloading(true);
+        try {
+            await downloadPhoto(currentPhoto, canvas);
         } catch (err) {
             console.error('Download error:', err);
-            setDownloading(false);
             alert('Download failed.');
+        } finally {
+            setDownloading(false);
         }
+    };
+
+    const handleDownloadAll = async () => {
+        if (photos.length === 0) return;
+        setDownloading(true);
+
+        for (let i = 0; i < photos.length; i++) {
+            const photo = photos[i];
+            // Update selected index to trigger re-render on the main canvas 
+            // OR use a dedicated rendering function. 
+            // For simplicity and speed, let's just trigger sequential downloads if possible,
+            // but the main canvas is reactive to selectedIndex.
+            setSelectedIndex(i);
+            // Wait for canvas to update (next tick)
+            await new Promise(resolve => setTimeout(resolve, 300));
+            if (canvas) {
+                await downloadPhoto(photo, canvas);
+            }
+        }
+
+        setDownloading(false);
     };
 
     const handleOpenOriginal = () => {
@@ -178,16 +232,21 @@ export const PhotoMetadataApp: React.FC = () => {
     };
 
     const reset = () => {
-        setImage(null);
-        setMetadata(null);
+        setPhotos([]);
+        setSelectedIndex(0);
         setCanvas(null);
         setDownloading(false);
-        setAspectRatio('original');
-        setTextPosition('bottom');
-        setHeaderScale(1.0);
-        setParamsScale(1.0);
-        setMarginScale(1.0);
         if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const removePhoto = (index: number) => {
+        setPhotos(prev => {
+            const next = prev.filter((_, i) => i !== index);
+            if (selectedIndex >= next.length && next.length > 0) {
+                setSelectedIndex(next.length - 1);
+            }
+            return next;
+        });
     };
 
     const formatShutterSpeed = (exposureTime?: number): string => {
@@ -196,8 +255,8 @@ export const PhotoMetadataApp: React.FC = () => {
         return `1/${Math.round(1 / exposureTime)}s`;
     };
 
-    // If no image, show the landing/upload view
-    if (!image || !metadata) {
+    // If no images, show the landing/upload view
+    if (photos.length === 0) {
         return (
             <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-200 flex flex-col items-center justify-center p-6">
                 <header className="mb-6 text-center space-y-3 pt-16">
@@ -235,15 +294,15 @@ export const PhotoMetadataApp: React.FC = () => {
                                     onDragOver={handleDrag}
                                     onDrop={handleDrop}
                                     className={`w-full max-w-xl mx-auto md:mx-0 aspect-[21/9] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer transition-all group relative overflow-hidden ${dragActive
-                                            ? "border-neutral-900 bg-neutral-100 shadow-2xl scale-[1.02]"
-                                            : "border-neutral-200 bg-neutral-50/50 hover:border-neutral-400 hover:bg-white hover:shadow-xl"
+                                        ? "border-neutral-900 bg-neutral-100 shadow-2xl scale-[1.02]"
+                                        : "border-neutral-200 bg-neutral-50/50 hover:border-neutral-400 hover:bg-white hover:shadow-xl"
                                         }`}
                                 >
                                     <div className="p-4 rounded-full bg-white border border-neutral-100 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                         <Upload className="w-8 h-8 text-neutral-800" />
                                     </div>
                                     <div className="text-center space-y-1">
-                                        <p className="font-bold text-neutral-800 text-lg">Drop your photo here</p>
+                                        <p className="font-bold text-neutral-800 text-lg">Drop your photo/s here</p>
                                         <p className="text-sm text-neutral-400">Supports JPG, PNG, HEIC with EXIF</p>
                                     </div>
                                     <input
@@ -251,6 +310,7 @@ export const PhotoMetadataApp: React.FC = () => {
                                         ref={fileInputRef}
                                         onChange={handleFileChange}
                                         accept="image/*"
+                                        multiple
                                         className="hidden"
                                     />
                                 </div>
@@ -291,29 +351,57 @@ export const PhotoMetadataApp: React.FC = () => {
         <div className="min-h-screen lg:h-screen w-full bg-neutral-100 flex flex-col lg:flex-row font-sans text-neutral-900 lg:overflow-hidden overflow-auto">
 
             {/* Main Stage (Canvas) */}
-            <div className="flex-1 bg-neutral-200/50 relative flex items-center justify-center overflow-hidden p-4 lg:p-8 min-h-[50vh] lg:min-h-0">
+            <div className="flex-1 bg-neutral-200/50 relative flex flex-col items-center justify-center overflow-hidden p-4 lg:p-8 min-h-[60vh] lg:min-h-0">
+                {/* Thumbnail Strip */}
+                <div className="absolute top-4 left-4 right-4 z-20 flex justify-center">
+                    <div className="flex gap-2 p-2 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg overflow-x-auto max-w-full">
+                        {photos.map((p, i) => (
+                            <div key={p.id} className="relative group">
+                                <button
+                                    onClick={() => setSelectedIndex(i)}
+                                    className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${selectedIndex === i ? 'border-neutral-900 scale-110 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
+                                        }`}
+                                >
+                                    <img src={p.originalImageSrc} className="w-full h-full object-cover" alt={`Photo ${i + 1}`} />
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); removePhoto(i); }}
+                                    className="absolute -top-1 -right-1 bg-white rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity text-neutral-400 hover:text-red-500"
+                                >
+                                    <Trash2 className="w-3 h-3" />
+                                </button>
+                            </div>
+                        ))}
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-12 h-12 rounded-lg border-2 border-dashed border-neutral-300 flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:border-neutral-400 transition-all"
+                        >
+                            <Upload className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+
                 <PhotoCanvas
-                    image={image}
-                    metadata={metadata}
+                    image={currentPhoto.image}
+                    metadata={currentPhoto.metadata}
                     onCanvasReady={setCanvas}
-                    aspectRatio={aspectRatio}
-                    textPosition={textPosition}
-                    headerScale={headerScale}
-                    paramsScale={paramsScale}
-                    marginScale={marginScale}
+                    aspectRatio={currentPhoto.settings.aspectRatio}
+                    textPosition={currentPhoto.settings.textPosition}
+                    headerScale={currentPhoto.settings.headerScale}
+                    paramsScale={currentPhoto.settings.paramsScale}
+                    marginScale={currentPhoto.settings.marginScale}
                 />
             </div>
 
             {/* Crop Overlay */}
-            {isCropping && originalImageSrc && (
+            {isCropping && currentPhoto.originalImageSrc && (
                 <div className="absolute inset-0 z-50 bg-black flex flex-col">
                     <div className="relative flex-1">
                         <Cropper
-                            image={originalImageSrc}
+                            image={currentPhoto.originalImageSrc}
                             crop={crop}
                             zoom={zoom}
-                            aspect={undefined} // Free crop or maybe lock to aspectRatio? Let's leave free for now or match selected. 
-                            // User wants to "crop the image". Usually means composition.
+                            aspect={undefined}
                             onCropChange={setCrop}
                             onCropComplete={onCropComplete}
                             onZoomChange={setZoom}
@@ -388,19 +476,33 @@ export const PhotoMetadataApp: React.FC = () => {
                             <div className="flex flex-col gap-1">
                                 <div className="flex justify-between items-center text-xs text-neutral-500 font-medium uppercase tracking-wider">
                                     <span>Margins</span>
-                                    <span>{Math.round(marginScale * 100)}%</span>
+                                    <span>{Math.round(currentPhoto.settings.marginScale * 100)}%</span>
                                 </div>
                                 <input
                                     type="range"
                                     min="0"
                                     max="2"
                                     step="0.05"
-                                    value={marginScale}
-                                    onChange={(e) => setMarginScale(parseFloat(e.target.value))}
+                                    value={currentPhoto.settings.marginScale}
+                                    onChange={(e) => updateCurrentSettings({ marginScale: parseFloat(e.target.value) })}
                                     className="w-full h-1 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-neutral-900"
                                 />
                             </div>
                         </div>
+                    </div>
+
+                    {/* Batch Tool */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-3 text-neutral-500">
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Batch</span>
+                        </div>
+                        <button
+                            onClick={applyToAll}
+                            className="w-full py-3 px-4 bg-white border border-neutral-200 text-neutral-700 rounded-xl font-medium text-sm hover:bg-neutral-50 hover:border-neutral-300 transition-all flex items-center justify-center gap-2 shadow-sm"
+                        >
+                            Apply settings to all {photos.length > 1 ? `(${photos.length})` : ''}
+                        </button>
                     </div>
 
                     {/* Metadata Summary */}
@@ -412,19 +514,19 @@ export const PhotoMetadataApp: React.FC = () => {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold block mb-1">Model</span>
-                                <span className="text-sm font-semibold text-neutral-800 truncate block" title={metadata.model}>{metadata.model || 'Unknown'}</span>
+                                <span className="text-sm font-semibold text-neutral-800 truncate block" title={currentPhoto.metadata.model}>{currentPhoto.metadata.model || 'Unknown'}</span>
                             </div>
                             <div>
                                 <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold block mb-1">ISO</span>
-                                <span className="text-sm font-semibold text-neutral-800 block">{metadata.iso || '-'}</span>
+                                <span className="text-sm font-semibold text-neutral-800 block">{currentPhoto.metadata.iso || '-'}</span>
                             </div>
                             <div>
                                 <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold block mb-1">Aperture</span>
-                                <span className="text-sm font-semibold text-neutral-800 block">{metadata.fNumber ? `f/${metadata.fNumber}` : '-'}</span>
+                                <span className="text-sm font-semibold text-neutral-800 block">{currentPhoto.metadata.fNumber ? `f/${currentPhoto.metadata.fNumber}` : '-'}</span>
                             </div>
                             <div>
                                 <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold block mb-1">Shutter</span>
-                                <span className="text-sm font-semibold text-neutral-800 block">{formatShutterSpeed(metadata.exposureTime)}</span>
+                                <span className="text-sm font-semibold text-neutral-800 block">{formatShutterSpeed(currentPhoto.metadata.exposureTime)}</span>
                             </div>
                         </div>
                     </div>
@@ -439,14 +541,14 @@ export const PhotoMetadataApp: React.FC = () => {
                             {(['original', '1:1', '4:5', '9:16'] as AspectRatio[]).map((ratio) => (
                                 <button
                                     key={ratio}
-                                    onClick={() => setAspectRatio(ratio)}
-                                    className={`py-3 px-4 text-sm font-medium rounded-xl border transition-all text-left flex items-center justify-between group ${aspectRatio === ratio
+                                    onClick={() => updateCurrentSettings({ aspectRatio: ratio })}
+                                    className={`py-3 px-4 text-sm font-medium rounded-xl border transition-all text-left flex items-center justify-between group ${currentPhoto.settings.aspectRatio === ratio
                                         ? 'bg-neutral-900 border-neutral-900 text-white shadow-md'
                                         : 'bg-white border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50'
                                         }`}
                                 >
                                     <span className="capitalize">{ratio === 'original' ? 'Original' : ratio}</span>
-                                    {aspectRatio === ratio && <div className="w-2 h-2 rounded-full bg-white animate-pulse" />}
+                                    {currentPhoto.settings.aspectRatio === ratio && <div className="w-2 h-2 rounded-full bg-white animate-pulse" />}
                                 </button>
                             ))}
                         </div>
@@ -463,15 +565,15 @@ export const PhotoMetadataApp: React.FC = () => {
                             <div className="flex flex-col gap-1">
                                 <div className="flex justify-between items-center text-xs text-neutral-500 font-medium uppercase tracking-wider">
                                     <span>Header Size</span>
-                                    <span>{Math.round(headerScale * 100)}%</span>
+                                    <span>{Math.round(currentPhoto.settings.headerScale * 100)}%</span>
                                 </div>
                                 <input
                                     type="range"
                                     min="0.5"
                                     max="1.5"
                                     step="0.05"
-                                    value={headerScale}
-                                    onChange={(e) => setHeaderScale(parseFloat(e.target.value))}
+                                    value={currentPhoto.settings.headerScale}
+                                    onChange={(e) => updateCurrentSettings({ headerScale: parseFloat(e.target.value) })}
                                     className="w-full h-1 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-neutral-900"
                                 />
                             </div>
@@ -480,15 +582,15 @@ export const PhotoMetadataApp: React.FC = () => {
                             <div className="flex flex-col gap-1">
                                 <div className="flex justify-between items-center text-xs text-neutral-500 font-medium uppercase tracking-wider">
                                     <span>Data Size</span>
-                                    <span>{Math.round(paramsScale * 100)}%</span>
+                                    <span>{Math.round(currentPhoto.settings.paramsScale * 100)}%</span>
                                 </div>
                                 <input
                                     type="range"
                                     min="0.5"
                                     max="1.5"
                                     step="0.05"
-                                    value={paramsScale}
-                                    onChange={(e) => setParamsScale(parseFloat(e.target.value))}
+                                    value={currentPhoto.settings.paramsScale}
+                                    onChange={(e) => updateCurrentSettings({ paramsScale: parseFloat(e.target.value) })}
                                     className="w-full h-1 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-neutral-900"
                                 />
                             </div>
@@ -504,8 +606,8 @@ export const PhotoMetadataApp: React.FC = () => {
                         <div className="flex flex-col gap-2">
                             <div className="flex p-1 bg-neutral-100 rounded-xl">
                                 <button
-                                    onClick={() => setTextPosition('top')}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${textPosition === 'top'
+                                    onClick={() => updateCurrentSettings({ textPosition: 'top' })}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${currentPhoto.settings.textPosition === 'top'
                                         ? 'bg-white text-neutral-900 shadow-sm'
                                         : 'text-neutral-500 hover:text-neutral-700'
                                         }`}
@@ -513,8 +615,8 @@ export const PhotoMetadataApp: React.FC = () => {
                                     <ArrowUp className="w-4 h-4" /> Top
                                 </button>
                                 <button
-                                    onClick={() => setTextPosition('bottom')}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${textPosition === 'bottom'
+                                    onClick={() => updateCurrentSettings({ textPosition: 'bottom' })}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${currentPhoto.settings.textPosition === 'bottom'
                                         ? 'bg-white text-neutral-900 shadow-sm'
                                         : 'text-neutral-500 hover:text-neutral-700'
                                         }`}
@@ -522,8 +624,8 @@ export const PhotoMetadataApp: React.FC = () => {
                                     <ArrowDown className="w-4 h-4" /> Bottom
                                 </button>
                                 <button
-                                    onClick={() => setTextPosition('compact')}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${textPosition === 'compact'
+                                    onClick={() => updateCurrentSettings({ textPosition: 'compact' })}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${currentPhoto.settings.textPosition === 'compact'
                                         ? 'bg-white text-neutral-900 shadow-sm'
                                         : 'text-neutral-500 hover:text-neutral-700'
                                         }`}
@@ -545,15 +647,26 @@ export const PhotoMetadataApp: React.FC = () => {
                         {downloading ? (
                             <>
                                 <RefreshCcw className="w-5 h-5 animate-spin" />
-                                Processing...
+                                Processing batch...
                             </>
                         ) : (
                             <>
                                 <Download className="w-5 h-5" />
-                                Download Frame
+                                Download {photos.length > 1 ? `Selection (${photos.length})` : 'Frame'}
                             </>
                         )}
                     </button>
+
+                    {photos.length > 1 && (
+                        <button
+                            onClick={handleDownloadAll}
+                            disabled={!canvas || downloading}
+                            className="w-full py-3 bg-neutral-100 text-neutral-700 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                            <Download className="w-4 h-4" />
+                            Download Zip/All
+                        </button>
+                    )}
 
                     <button
                         onClick={handleOpenOriginal}
@@ -571,6 +684,7 @@ export const PhotoMetadataApp: React.FC = () => {
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 accept="image/*"
+                multiple
                 className="hidden"
             />
         </div>
