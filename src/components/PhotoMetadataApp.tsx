@@ -413,20 +413,27 @@ export const PhotoMetadataApp: React.FC = () => {
                         </div>
                     )}
                 </div>
-                <footer className="mt-12 py-8 text-center text-neutral-400 text-xs space-y-2 w-full border-t border-neutral-100">
-                    <div className="flex items-center justify-center gap-2">
-                        <Camera className="w-3 h-3" />
-                        <span>Built by</span>
-                        <a
-                            href="https://alexvareloraw.site/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-medium text-neutral-600 hover:text-neutral-900 transition-colors underline underline-offset-2"
-                        >
-                            alexvarelo
-                        </a>
+                <footer className="mt-24 py-12 text-center text-neutral-400 text-[10px] md:text-xs space-y-6 w-full border-t border-neutral-100">
+                    <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 font-medium uppercase tracking-widest text-neutral-300">
+                        <span className="hover:text-neutral-500 transition-colors cursor-default">Photo Framing Tool</span>
+                        <span className="hover:text-neutral-500 transition-colors cursor-default">EXIF Data</span>
+                        <span className="hover:text-neutral-500 transition-colors cursor-default">Photography</span>
                     </div>
-                    <p>© 2026 FrameMark • Minimal Design</p>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-center gap-2">
+                            <Camera className="w-3 h-3" />
+                            <span>Built by</span>
+                            <a
+                                href="https://alexvareloraw.site/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-semibold text-neutral-600 hover:text-neutral-900 transition-colors underline underline-offset-4 decoration-neutral-200 hover:decoration-neutral-400"
+                            >
+                                alexvarelo
+                            </a>
+                        </div>
+                        <p className="tracking-wide">© 2026 FrameMark • Minimal Design & Ethics</p>
+                    </div>
                 </footer>
             </div>
         );
