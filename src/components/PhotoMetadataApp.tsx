@@ -6,7 +6,7 @@ import type { AspectRatio, TextPosition } from './PhotoCanvas';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../lib/crop-utils';
 import FlipGallery from './ui/flip-gallery';
-import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon, Trash2, CheckCircle2 } from 'lucide-react';
+import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon, Trash2, CheckCircle2, Info, Twitter } from 'lucide-react';
 
 interface PhotoData {
     id: string;
@@ -324,6 +324,91 @@ export const PhotoMetadataApp: React.FC = () => {
                                     </p>
                                     <FlipGallery />
                                 </div>
+                            </div>
+
+                            {/* SEO / Content Sections */}
+                            <div className="mt-24 space-y-32">
+                                {/* Features Section */}
+                                <section className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-24">
+                                    <div className="flex flex-col items-center text-center space-y-4">
+                                        <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center overflow-hidden">
+                                            <img src="/assets/privacy-cat.png" alt="Privacy First" className="w-full h-full object-contain" />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
+                                                Privacy First
+                                            </h3>
+                                            <p className="text-neutral-500 text-base md:text-lg leading-relaxed max-w-sm mx-auto">
+                                                Your photos never leave your device. All processing happens locally in your browser.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-center text-center space-y-4">
+                                        <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center overflow-hidden">
+                                            <img src="/assets/batch-cat.png" alt="Batch Processing" className="w-full h-full object-contain" />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
+                                                Batch Power
+                                            </h3>
+                                            <p className="text-neutral-500 text-base md:text-lg leading-relaxed max-w-sm mx-auto">
+                                                Upload multiple photos, apply uniform settings, and download everything in one go.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-center text-center space-y-4">
+                                        <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center overflow-hidden">
+                                            <img src="/assets/metadata-cat.png" alt="Pro Metadata" className="w-full h-full object-contain" />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
+                                                Pro Metadata
+                                            </h3>
+                                            <p className="text-neutral-500 text-base md:text-lg leading-relaxed max-w-sm mx-auto">
+                                                Extract ISO, Aperture, and Shutter Speed to give your photography a pro edge.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* FAQ Section */}
+                                <section className="max-w-3xl mx-auto space-y-12 pb-32 pt-16">
+                                    <div className="text-center space-y-4">
+                                        <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
+                                            Frequently Asked Questions
+                                        </h2>
+                                        <p className="text-neutral-500 text-lg">Everything you need to know about FrameMark.</p>
+                                    </div>
+                                    <div className="space-y-10">
+                                        <div className="space-y-3">
+                                            <h4 className="text-xl md:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500 flex items-center gap-3">
+                                                <Info className="w-5 h-5 text-neutral-400 shrink-0" />
+                                                Does it support RAW or HEIC?
+                                            </h4>
+                                            <p className="text-neutral-500 text-sm md:text-base leading-relaxed pl-8">
+                                                FrameMark supports JPG, PNG, and HEIC. For RAW files, we recommend converting to a high-quality JPG first for the best browser performance.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h4 className="text-xl md:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500 flex items-center gap-3">
+                                                <Info className="w-5 h-5 text-neutral-400 shrink-0" />
+                                                Is it free?
+                                            </h4>
+                                            <p className="text-neutral-500 text-sm md:text-base leading-relaxed pl-8">
+                                                Absolutely. FrameMark is a free community tool built for photographers who appreciate minimalist design and metadata precision.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h4 className="text-xl md:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500 flex items-center gap-3">
+                                                <Info className="w-5 h-5 text-neutral-400 shrink-0" />
+                                                Where are my photos stored?
+                                            </h4>
+                                            <p className="text-neutral-500 text-sm md:text-base leading-relaxed pl-8">
+                                                Nowhere. All processing happens locally in your browser. Once you close the tab, your images are cleared from temporary memory.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </section>
                             </div>
                         </div>
                     )}
@@ -648,7 +733,7 @@ export const PhotoMetadataApp: React.FC = () => {
                         {downloading ? (
                             <>
                                 <RefreshCcw className="w-5 h-5 animate-spin" />
-                                Processing batch...
+                                Processing...
                             </>
                         ) : (
                             <>
@@ -658,16 +743,27 @@ export const PhotoMetadataApp: React.FC = () => {
                         )}
                     </button>
 
-                    {photos.length > 1 && (
-                        <button
-                            onClick={handleDownloadAll}
-                            disabled={!canvas || downloading}
-                            className="w-full py-3 bg-neutral-100 text-neutral-700 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    <div className="grid grid-cols-2 gap-3">
+                        {photos.length > 1 && (
+                            <button
+                                onClick={handleDownloadAll}
+                                disabled={!canvas || downloading}
+                                className="py-3 bg-neutral-100 text-neutral-700 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm"
+                            >
+                                <Download className="w-4 h-4" />
+                                All
+                            </button>
+                        )}
+                        <a
+                            href={`https://twitter.com/intent/tweet?text=Check%20out%20my%20photography%20with%20minimalist%20metadata%20frames%20on%20FrameMark!%20%23photography%20%23framemark%20https://framemark.app`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="py-3 bg-neutral-100 text-neutral-700 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all text-sm"
                         >
-                            <Download className="w-4 h-4" />
-                            Download Zip/All
-                        </button>
-                    )}
+                            <Twitter className="w-4 h-4" />
+                            Share
+                        </a>
+                    </div>
 
                     <button
                         onClick={handleOpenOriginal}
