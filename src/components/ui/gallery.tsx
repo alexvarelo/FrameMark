@@ -98,6 +98,15 @@ export const PhotoGallery = ({
             direction: "right" as Direction,
             src: "/examples/example4.jpg",
         },
+        {
+            id: 5,
+            order: 4,
+            x: "400px",
+            y: "12px",
+            zIndex: 10,
+            direction: "right" as Direction,
+            src: "/examples/example5.jpg",
+        },
     ];
 
     return (

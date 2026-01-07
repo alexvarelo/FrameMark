@@ -6,6 +6,7 @@ const images = [
     { title: 'Example 2', url: '/examples/example2.jpg' },
     { title: 'Example 3', url: '/examples/example3.jpg' },
     { title: 'Example 4', url: '/examples/example4.jpg' },
+    { title: 'Example 5', url: '/examples/example5.jpg' },
 ];
 
 const FLIP_SPEED = 750;
