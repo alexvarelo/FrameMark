@@ -13,6 +13,7 @@ export const PhotoMetadataApp: React.FC = () => {
     const [metadata, setMetadata] = useState<PhotoMetadata | null>(null);
     const [loading, setLoading] = useState(false);
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+    const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [downloading, setDownloading] = useState(false);
@@ -34,7 +35,10 @@ export const PhotoMetadataApp: React.FC = () => {
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        processFile(file);
+    };
 
+    const processFile = async (file: File) => {
         setLoading(true);
         try {
             // Extract Metadata
@@ -52,6 +56,25 @@ export const PhotoMetadataApp: React.FC = () => {
         } catch (error) {
             console.error('Error processing image:', error);
             setLoading(false);
+        }
+    };
+
+    const handleDrag = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === "dragenter" || e.type === "dragover") {
+            setDragActive(true);
+        } else if (e.type === "dragleave") {
+            setDragActive(false);
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            processFile(e.dataTransfer.files[0]);
         }
     };
 
@@ -207,7 +230,14 @@ export const PhotoMetadataApp: React.FC = () => {
                             <div className="flex-1">
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="w-full max-w-xl mx-auto md:mx-0 aspect-[21/9] border-2 border-dashed border-neutral-200 rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-neutral-400 hover:bg-white hover:shadow-xl transition-all group relative overflow-hidden bg-neutral-50/50"
+                                    onDragEnter={handleDrag}
+                                    onDragLeave={handleDrag}
+                                    onDragOver={handleDrag}
+                                    onDrop={handleDrop}
+                                    className={`w-full max-w-xl mx-auto md:mx-0 aspect-[21/9] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer transition-all group relative overflow-hidden ${dragActive
+                                            ? "border-neutral-900 bg-neutral-100 shadow-2xl scale-[1.02]"
+                                            : "border-neutral-200 bg-neutral-50/50 hover:border-neutral-400 hover:bg-white hover:shadow-xl"
+                                        }`}
                                 >
                                     <div className="p-4 rounded-full bg-white border border-neutral-100 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                         <Upload className="w-8 h-8 text-neutral-800" />
