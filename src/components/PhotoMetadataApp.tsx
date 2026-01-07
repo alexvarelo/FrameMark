@@ -258,76 +258,77 @@ export const PhotoMetadataApp: React.FC = () => {
     // If no images, show the landing/upload view
     if (photos.length === 0) {
         return (
-            <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-200 flex flex-col items-center justify-center p-6">
-                <header className="mb-6 text-center space-y-3 pt-16">
-                    <div className="flex flex-col items-center justify-center">
-                        <img src="/favicon.png" alt="FrameMark" className="w-32 h-32 md:w-56 md:h-56 drop-shadow-sm" />
-                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500 -mt-2 md:-mt-6 px-4">
-                            Framemark
-                        </h1>
-                    </div>
-                    <div className="space-y-2 max-w-xl mx-auto">
-                        <p className="text-lg font-medium text-neutral-800">
-                            The extracted metadata camera frame tool.
-                        </p>
-                        <p className="text-sm text-neutral-500 leading-relaxed">
-                            Elevate your photography with minimalist, metadata-rich borders.
-                        </p>
-                    </div>
-                </header>
+            <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-200 flex flex-col items-center p-6">
+                <div className="flex-1 w-full flex flex-col items-center justify-center">
+                    <header className="mb-6 text-center space-y-3 pt-16">
+                        <div className="flex flex-col items-center justify-center">
+                            <img src="/favicon.png" alt="FrameMark" className="w-32 h-32 md:w-56 md:h-56 drop-shadow-sm" />
+                            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500 -mt-2 md:-mt-6 px-4">
+                                Framemark
+                            </h1>
+                        </div>
+                        <div className="space-y-2 max-w-xl mx-auto">
+                            <p className="text-lg font-medium text-neutral-800">
+                                The extracted metadata camera frame tool.
+                            </p>
+                            <p className="text-sm text-neutral-500 leading-relaxed">
+                                Elevate your photography with minimalist, metadata-rich borders.
+                            </p>
+                        </div>
+                    </header>
 
-                {loading ? (
-                    <div className="flex flex-col items-center gap-4 py-20 animate-in fade-in duration-700">
-                        <RefreshCcw className="w-10 h-10 animate-spin text-neutral-400" />
-                        <p className="text-neutral-500 font-medium italic">Developing your photo...</p>
-                    </div>
-                ) : (
-                    <div className="w-full max-w-6xl mx-auto">
-                        {/* Desktop: side-by-side, Mobile: stacked */}
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 md:gap-12">
-                            {/* Upload Area */}
-                            <div className="flex-1">
-                                <div
-                                    onClick={() => fileInputRef.current?.click()}
-                                    onDragEnter={handleDrag}
-                                    onDragLeave={handleDrag}
-                                    onDragOver={handleDrag}
-                                    onDrop={handleDrop}
-                                    className={`w-full max-w-xl mx-auto md:mx-0 aspect-[21/9] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer transition-all group relative overflow-hidden ${dragActive
-                                        ? "border-neutral-900 bg-neutral-100 shadow-2xl scale-[1.02]"
-                                        : "border-neutral-200 bg-neutral-50/50 hover:border-neutral-400 hover:bg-white hover:shadow-xl"
-                                        }`}
-                                >
-                                    <div className="p-4 rounded-full bg-white border border-neutral-100 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                                        <Upload className="w-8 h-8 text-neutral-800" />
+                    {loading ? (
+                        <div className="flex flex-col items-center gap-4 py-20 animate-in fade-in duration-700">
+                            <RefreshCcw className="w-10 h-10 animate-spin text-neutral-400" />
+                            <p className="text-neutral-500 font-medium italic">Developing your photo...</p>
+                        </div>
+                    ) : (
+                        <div className="w-full max-w-6xl mx-auto">
+                            {/* Desktop: side-by-side, Mobile: stacked */}
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 md:gap-12">
+                                {/* Upload Area */}
+                                <div className="flex-1">
+                                    <div
+                                        onClick={() => fileInputRef.current?.click()}
+                                        onDragEnter={handleDrag}
+                                        onDragLeave={handleDrag}
+                                        onDragOver={handleDrag}
+                                        onDrop={handleDrop}
+                                        className={`w-full max-w-xl mx-auto md:mx-0 aspect-[21/9] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer transition-all group relative overflow-hidden ${dragActive
+                                            ? "border-neutral-900 bg-neutral-100 shadow-2xl scale-[1.02]"
+                                            : "border-neutral-200 bg-neutral-50/50 hover:border-neutral-400 hover:bg-white hover:shadow-xl"
+                                            }`}
+                                    >
+                                        <div className="p-4 rounded-full bg-white border border-neutral-100 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                            <Upload className="w-8 h-8 text-neutral-800" />
+                                        </div>
+                                        <div className="text-center space-y-1">
+                                            <p className="font-bold text-neutral-800 text-lg">Drop your photo/s here</p>
+                                            <p className="text-sm text-neutral-400">Supports JPG, PNG, HEIC with EXIF</p>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            accept="image/*"
+                                            multiple
+                                            className="hidden"
+                                        />
                                     </div>
-                                    <div className="text-center space-y-1">
-                                        <p className="font-bold text-neutral-800 text-lg">Drop your photo/s here</p>
-                                        <p className="text-sm text-neutral-400">Supports JPG, PNG, HEIC with EXIF</p>
-                                    </div>
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileChange}
-                                        accept="image/*"
-                                        multiple
-                                        className="hidden"
-                                    />
+                                </div>
+
+                                {/* FlipGallery with label */}
+                                <div className="flex-shrink-0">
+                                    <p className="text-center text-xs font-light uppercase tracking-widest text-neutral-400 mb-4">
+                                        Inspiration
+                                    </p>
+                                    <FlipGallery />
                                 </div>
                             </div>
-
-                            {/* FlipGallery with label */}
-                            <div className="flex-shrink-0">
-                                <p className="text-center text-xs font-light uppercase tracking-widest text-neutral-400 mb-4">
-                                    Inspiration
-                                </p>
-                                <FlipGallery />
-                            </div>
                         </div>
-                    </div>
-                )}
-
-                <footer className="mt-8 text-center text-neutral-400 text-xs space-y-2">
+                    )}
+                </div>
+                <footer className="mt-12 py-8 text-center text-neutral-400 text-xs space-y-2 w-full border-t border-neutral-100">
                     <div className="flex items-center justify-center gap-2">
                         <Camera className="w-3 h-3" />
                         <span>Built by</span>
@@ -340,7 +341,7 @@ export const PhotoMetadataApp: React.FC = () => {
                             alexvarelo
                         </a>
                     </div>
-                    <p>© 2025 FrameMark • Minimal Design</p>
+                    <p>© 2026 FrameMark • Minimal Design</p>
                 </footer>
             </div>
         );
