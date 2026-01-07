@@ -6,7 +6,7 @@ import type { AspectRatio, TextPosition } from './PhotoCanvas';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../lib/crop-utils';
 import FlipGallery from './ui/flip-gallery';
-import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon, Trash2, CheckCircle2, Info, Twitter, X } from 'lucide-react';
+import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon, Trash2, CheckCircle2, Info, X } from 'lucide-react';
 
 interface PhotoData {
     id: string;
@@ -762,7 +762,7 @@ export const PhotoMetadataApp: React.FC = () => {
                             </button>
                         )}
                         <a
-                            href={`https://twitter.com/intent/tweet?text=Check%20out%20my%20photography%20with%20minimalist%20metadata%20frames%20on%20FrameMark!%20%23photography%20%23framemark%20https://framemark.app`}
+                            href={`https://twitter.com/intent/tweet?text=Check%20out%20my%20photography%20with%20minimalist%20metadata%20frames%20on%20FrameMark!%20%23photography%20%23framemark%20https://framemark.space`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="py-3 bg-neutral-100 text-neutral-700 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all text-sm"
