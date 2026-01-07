@@ -260,9 +260,9 @@ export const PhotoMetadataApp: React.FC = () => {
         return (
             <div className="min-h-screen bg-neutral-50 text-neutral-900 font-sans selection:bg-neutral-200 flex flex-col items-center justify-center p-6">
                 <header className="mb-6 text-center space-y-3 pt-16">
-                    <div className="flex items-center justify-center">
-                        <img src="/favicon.png" alt="FrameMark" className="w-20 h-20 md:w-40 md:h-40" />
-                        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500">
+                    <div className="flex flex-col items-center justify-center">
+                        <img src="/favicon.png" alt="FrameMark" className="w-32 h-32 md:w-56 md:h-56 drop-shadow-sm" />
+                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-500 -mt-2 md:-mt-6 px-4">
                             Framemark
                         </h1>
                     </div>
