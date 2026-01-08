@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { extractMetadata } from '../lib/exif-utils';
 import type { PhotoMetadata } from '../lib/exif-utils';
 import { PhotoCanvas } from './PhotoCanvas';
-import type { AspectRatio, TextPosition } from './PhotoCanvas';
+import type { AspectRatio, TextPosition, FrameStyle, PhotoTheme } from './PhotoCanvas';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../lib/crop-utils';
 import FlipGallery from './ui/flip-gallery';
@@ -16,6 +16,9 @@ interface PhotoData {
     settings: {
         aspectRatio: AspectRatio;
         textPosition: TextPosition;
+        frameStyle: FrameStyle;
+        theme: PhotoTheme;
+        showLogo: boolean;
         headerScale: number;
         paramsScale: number;
         marginScale: number;
@@ -81,6 +84,9 @@ export const PhotoMetadataApp: React.FC = () => {
                     settings: {
                         aspectRatio: 'original',
                         textPosition: 'bottom',
+                        frameStyle: 'classic',
+                        theme: 'light',
+                        showLogo: true,
                         headerScale: 1.0,
                         paramsScale: 1.0,
                         marginScale: 1.0,
@@ -480,6 +486,9 @@ export const PhotoMetadataApp: React.FC = () => {
                     onCanvasReady={setCanvas}
                     aspectRatio={currentPhoto.settings.aspectRatio}
                     textPosition={currentPhoto.settings.textPosition}
+                    frameStyle={currentPhoto.settings.frameStyle}
+                    theme={currentPhoto.settings.theme}
+                    showLogo={currentPhoto.settings.showLogo}
                     headerScale={currentPhoto.settings.headerScale}
                     paramsScale={currentPhoto.settings.paramsScale}
                     marginScale={currentPhoto.settings.marginScale}
@@ -562,12 +571,59 @@ export const PhotoMetadataApp: React.FC = () => {
                     {/* Spacing */}
                     <div>
                         <div className="flex items-center gap-2 mb-3 text-neutral-500">
-                            <Maximize2 className="w-4 h-4" /> {/* Reusing Maximize2 or Layout icon */}
-                            <span className="text-xs font-bold uppercase tracking-widest">Spacing</span>
+                            <Maximize2 className="w-4 h-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Layout & Style</span>
                         </div>
-                        <div className="bg-white p-4 rounded-xl border border-neutral-100 shadow-sm">
-                            <div className="flex flex-col gap-1">
-                                <div className="flex justify-between items-center text-xs text-neutral-500 font-medium uppercase tracking-wider">
+                        <div className="bg-white p-4 rounded-xl border border-neutral-100 shadow-sm space-y-4">
+                            <div className="flex flex-col gap-2">
+                                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Frame Style</span>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {(['classic', 'editorial'] as FrameStyle[]).map((s) => (
+                                        <button
+                                            key={s}
+                                            onClick={() => updateCurrentSettings({ frameStyle: s })}
+                                            className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${currentPhoto.settings.frameStyle === s
+                                                ? 'bg-neutral-900 border-neutral-900 text-white shadow-md'
+                                                : 'bg-white border-neutral-200 text-neutral-500 hover:border-neutral-400'
+                                                }`}
+                                        >
+                                            {s.charAt(0).toUpperCase() + s.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2 border-t border-neutral-50 pt-4">
+                                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Frame Theme</span>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {(['light', 'dark'] as PhotoTheme[]).map((t) => (
+                                        <button
+                                            key={t}
+                                            onClick={() => updateCurrentSettings({ theme: t })}
+                                            className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border flex items-center justify-center gap-2 ${currentPhoto.settings.theme === t
+                                                ? 'bg-neutral-900 border-neutral-900 text-white shadow-md'
+                                                : 'bg-white border-neutral-200 text-neutral-500 hover:border-neutral-400'
+                                                }`}
+                                        >
+                                            <div className={`w-2 h-2 rounded-full border ${t === 'light' ? 'bg-white border-neutral-200' : 'bg-black border-neutral-800'}`} />
+                                            {t.charAt(0).toUpperCase() + t.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between py-2 border-t border-neutral-50">
+                                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Brand Logo</span>
+                                <button
+                                    onClick={() => updateCurrentSettings({ showLogo: !currentPhoto.settings.showLogo })}
+                                    className={`w-10 h-5 rounded-full transition-all relative ${currentPhoto.settings.showLogo ? 'bg-neutral-900' : 'bg-neutral-200'}`}
+                                >
+                                    <div className={`absolute top-1 w-3 h-3 rounded-full bg-white transition-all ${currentPhoto.settings.showLogo ? 'right-1' : 'left-1'}`} />
+                                </button>
+                            </div>
+
+                            <div className="flex flex-col gap-1 border-t border-neutral-50 pt-3">
+                                <div className="flex justify-between items-center text-[10px] text-neutral-400 font-bold uppercase tracking-widest">
                                     <span>Margins</span>
                                     <span>{Math.round(currentPhoto.settings.marginScale * 100)}%</span>
                                 </div>
