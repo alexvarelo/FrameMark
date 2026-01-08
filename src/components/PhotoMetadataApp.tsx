@@ -6,6 +6,7 @@ import type { AspectRatio, TextPosition, FrameStyle, PhotoTheme } from './PhotoC
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../lib/crop-utils';
 import FlipGallery from './ui/flip-gallery';
+import { Logos3 } from './ui/logos3';
 import { Upload, Download, RefreshCcw, ExternalLink, Image as ImageIcon, Layout, ArrowUp, ArrowDown, Minimize, Maximize2, Camera, Type, Crop as CropIcon, Trash2, CheckCircle2, Info, X } from 'lucide-react';
 
 interface PhotoData {
@@ -22,6 +23,7 @@ interface PhotoData {
         headerScale: number;
         paramsScale: number;
         marginScale: number;
+        paddingScale: number;
     };
 }
 
@@ -90,6 +92,7 @@ export const PhotoMetadataApp: React.FC = () => {
                         headerScale: 1.0,
                         paramsScale: 1.0,
                         marginScale: 1.0,
+                        paddingScale: 1.0,
                     }
                 });
             } catch (error) {
@@ -332,8 +335,33 @@ export const PhotoMetadataApp: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* SEO / Content Sections */}
                             <div className="mt-24 space-y-32">
+                                {/* Brands Carousel */}
+                                <Logos3
+                                    heading="Extensive Brand Support"
+                                    logos={[
+                                        { id: 'fuji', description: 'Fujifilm', image: '/icons/light/fujifilm.png' },
+                                        { id: 'sony', description: 'Sony', image: '/icons/light/sony.png' },
+                                        { id: 'canon', description: 'Canon', image: '/icons/light/canon.png' },
+                                        { id: 'nikon', description: 'Nikon', image: '/icons/light/nikon.png' },
+                                        { id: 'leica', description: 'Leica', image: '/icons/light/leica.png' },
+                                        { id: 'hassel', description: 'Hasselblad', image: '/icons/light/hasselblad.png' },
+                                        { id: 'apple', description: 'Apple', image: '/icons/light/apple.png' },
+                                        { id: 'ricoh', description: 'Ricoh', image: '/icons/light/ricoh.png' },
+                                        { id: 'lumix', description: 'Lumix', image: '/icons/light/lumix.png' },
+                                        { id: 'samsung', description: 'Samsung', image: '/icons/light/samsung.png' },
+                                        { id: 'olympus', description: 'Olympus', image: '/icons/light/olympus.png' },
+                                        { id: 'om', description: 'OM System', image: '/icons/light/om.png' },
+                                        { id: 'pentax', description: 'Pentax', image: '/icons/light/pentax.png' },
+                                        { id: 'sigma', description: 'Sigma', image: '/icons/light/sigma.png' },
+                                        { id: 'dji', description: 'DJI', image: '/icons/light/dji.png' },
+                                        { id: 'contax', description: 'Contax', image: '/icons/light/contax.png' },
+                                        { id: 'mamiya', description: 'Mamiya', image: '/icons/light/mamiya.png' },
+                                        { id: 'phaseone', description: 'Phase One', image: '/icons/light/phaseone.png' },
+                                        { id: 'epson', description: 'Epson', image: '/icons/light/epson.png' },
+                                    ]}
+                                />
+
                                 {/* Features Section */}
                                 <section className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-24">
                                     <div className="flex flex-col items-center text-center space-y-4">
@@ -492,6 +520,7 @@ export const PhotoMetadataApp: React.FC = () => {
                     headerScale={currentPhoto.settings.headerScale}
                     paramsScale={currentPhoto.settings.paramsScale}
                     marginScale={currentPhoto.settings.marginScale}
+                    paddingScale={currentPhoto.settings.paddingScale}
                 />
             </div>
 

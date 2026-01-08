@@ -20,6 +20,7 @@ interface PhotoCanvasProps {
     headerScale?: number;
     paramsScale?: number;
     marginScale?: number;
+    paddingScale?: number;
 }
 
 export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
@@ -33,7 +34,8 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
     showLogo = true,
     headerScale = 1,
     paramsScale = 1,
-    marginScale = 1
+    marginScale = 1,
+    paddingScale = 1
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -53,7 +55,8 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
             const paramsTextColor = theme === 'light' ? '#bbbbbb' : '#444444';
 
             // Font Base Unit (independent of margin, relative to image)
-            const fontBasePadding = Math.min(image.width, image.height) * 0.1;
+            // Incorporate paddingScale here to affect the entire frame proportion
+            const fontBasePadding = (Math.min(image.width, image.height) * 0.1) * paddingScale;
 
             // Layout Padding (affected by margin scale)
             const basePadding = fontBasePadding * marginScale;
@@ -302,7 +305,7 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
         };
 
         draw();
-    }, [image, metadata, onCanvasReady, aspectRatio, textPosition, frameStyle, theme, showLogo, headerScale, paramsScale, marginScale]);
+    }, [image, metadata, onCanvasReady, aspectRatio, textPosition, frameStyle, theme, showLogo, headerScale, paramsScale, marginScale, paddingScale]);
 
     return (
         <div className="flex items-center justify-center w-full h-full min-h-0 min-w-0">
