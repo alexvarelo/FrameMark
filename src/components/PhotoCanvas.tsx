@@ -292,13 +292,13 @@ export const PhotoCanvas: React.FC<PhotoCanvasProps> = ({
                 ctx.fillStyle = primaryTextColor;
                 ctx.fillText(textMake, line1X, textY);
 
-                // Draw Line 2 (Settings) - Aligned to currentX
+                // Draw Line 2 (Settings) - Centered horizontally
                 ctx.font = `400 ${fontSizeSettings}px Inter, sans-serif`;
                 ctx.fillStyle = paramsTextColor;
-                ctx.textAlign = 'left';
+                ctx.textAlign = 'center';
 
                 const textY2 = textY + textLineSpacing;
-                ctx.fillText(settingsText, currentX, textY2);
+                ctx.fillText(settingsText, currentX + textBlockWidth / 2, textY2);
             }
 
             onCanvasReady(canvas);
