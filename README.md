@@ -1,8 +1,27 @@
-# 📸 FrameMark
+<div align="center">
+  <img src="public/favicon.png" width="160" height="160" alt="FrameMark Logo">
+  
+  # FrameMark
+  
+  **The extracted metadata camera frame tool.**
+  
+  *Elevate your photography with minimalist, metadata-rich borders.*
 
-**Professional framing and automatic EXIF metadata extraction for photographers.**
+  [![Website](https://img.shields.io/website?url=https%3A%2F%2Fwww.framemark.space%2F&style=flat-square&label=framemark.space)](https://www.framemark.space/)
+  [![GitHub license](https://img.shields.io/github/license/alexvarelo/FrameMark?style=flat-square)](https://github.com/alexvarelo/FrameMark/blob/main/LICENSE)
+  [![Batch Processing](https://img.shields.io/badge/Privacy-First-green?style=flat-square)](#-features)
+</div>
 
-FrameMark is a minimalist web application designed to give your photography a premium gallery look. It automatically extracts EXIF metadata (Camera Model, Aperture, Shutter Speed, ISO, etc.) and renders your photo framed on a clean white background with a sophisticated typographic watermark.
+<br />
+
+FrameMark is a professional, minimalist web application designed to give your photography a premium gallery look. It automatically extracts EXIF metadata (Camera Model, Aperture, Shutter Speed, ISO, etc.) and renders your photo framed on a clean background with a sophisticated typographic watermark—all processed locally in your browser.
+
+## 🖼️ Examples
+
+| Classic Style | Editorial Style |
+| :---: | :---: |
+| <img src="public/examples/example-snow.jpg" width="400" alt="Snow Forest Classic Example"> | <img src="public/examples/example5.jpg" width="400" alt="Olimpics Editorial Example"> |
+| *Clean, centered branding and metadata.* | *Sophisticated split-metadata layout.* |
 
 ## ✨ Features
 
