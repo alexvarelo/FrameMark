@@ -43,9 +43,9 @@ const Logos3 = ({
                             {logos.map((logo) => (
                                 <CarouselItem
                                     key={logo.id}
-                                    className="flex basis-1/2 justify-center pl-0 sm:basis-1/3 md:basis-1/4 lg:basis-1/6"
+                                    className="flex basis-1/2 justify-center pl-0 sm:basis-1/3 md:basis-1/3 lg:basis-1/4"
                                 >
-                                    <div className="mx-16 md:mx-20 flex shrink-0 items-center justify-center transition-all duration-300">
+                                    <div className="mx-20 md:mx-32 flex shrink-0 items-center justify-center transition-all duration-300">
                                         <div>
                                             <img
                                                 src={logo.image}

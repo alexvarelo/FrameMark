@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const images = [
-    { title: 'Example 1', url: '/examples/example1.jpg' },
-    { title: 'Example 2', url: '/examples/example2.jpg' },
-    { title: 'Example 3', url: '/examples/example3.jpg' },
-    { title: 'Example 4', url: '/examples/example4.jpg' },
-    { title: 'Example 5', url: '/examples/example5.jpg' },
+    { title: 'Green', url: '/examples/example1.jpg' },
+    { title: 'Circles', url: '/examples/example2.jpg' },/* 
+    { title: 'Example 3', url: '/examples/example3.jpg' }, */
+    { title: 'Aesthetic', url: '/examples/example4.jpg' },
+    { title: 'Olimpics', url: '/examples/example5.jpg' },
+    { title: 'Winter Forest', url: '/examples/example-snow.jpg' },
 ];
 
 const FLIP_SPEED = 750;

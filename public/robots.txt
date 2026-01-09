@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /favicon3.png
+Allow: /favicon.png
+Allow: /favicon2.png
+Allow: /faviconReal.png
+
+Sitemap: https://www.framemark.space/sitemap.xml
